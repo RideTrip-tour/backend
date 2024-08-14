@@ -1,6 +1,6 @@
 from sqlalchemy import select
 
-from scr.database import Base
+from src.database import Base
 
 
 async def get_items(session, model: Base):

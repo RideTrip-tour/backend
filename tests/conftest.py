@@ -4,8 +4,8 @@ from httpx import ASGITransport, AsyncClient
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from scr.main import app
-from scr.database import Base, DATABASE_URL, get_async_session
+from src.main import app
+from src.database import Base, DATABASE_URL, get_async_session
 
 DATABASE_URL_TEST = DATABASE_URL._replace(database='rtt_test')
 

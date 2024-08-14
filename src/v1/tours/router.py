@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from scr.database import get_async_session
+from src.database import get_async_session
 
 from . import crud, models, schemas
 
