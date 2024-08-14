@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "ridetrip-tour"
+version = "0.1.0"
+description = ""
+authors = ["Badmajor <v.balonkin@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = {extras = ["standard"], version = "^0.112.0"}
+httpx = "^0.27.0"
+pytest = "^8.3.2"
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.31"}
+fastapi-users = "^13.0.0"
+trio = "^0.26.1"
+asyncpg = "^0.29.0"
+pytest-asyncio = "^0.23.8"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.pytest.ini_options]
+pythonpath = ['.', 'src']
+testpaths = ["tests",]
+python_files = ['test_*.py', ]
+addopts = "-vv"
+asyncio_mode = 'auto'
+
