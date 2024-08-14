@@ -1,7 +1,7 @@
 import pytest
 import pytest_asyncio
 
-from scr.v1.tours.models import TourORM, LocationORM
+from src.v1.tours.models import TourORM, LocationORM
 
 
 @pytest.fixture
