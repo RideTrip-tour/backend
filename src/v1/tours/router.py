@@ -9,7 +9,7 @@ from . import  models, schemas
 router = APIRouter()
 
 
-@router.get('/activities/', response_model=schemas.ActivityListResultSchemas)
+@router.get('/activities', response_model=schemas.ActivityListResultSchemas)
 async def get_activities(session: AsyncSession = Depends(get_async_session)):
     query = select(models.Activity)
     activities = await session.scalars(query)
@@ -27,7 +27,7 @@ async def get_activity(activity_id: int, session: AsyncSession = Depends(get_asy
         'result': activity,
     }
 
-@router.get('/locations/',response_model=schemas.LocationListResultSchemas)
+@router.get('/locations',response_model=schemas.LocationListResultSchemas)
 async def get_locations(session: AsyncSession = Depends(get_async_session)):
     query = select(models.Location)
     locations = await session.scalars(query)
