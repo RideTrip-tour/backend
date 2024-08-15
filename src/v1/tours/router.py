@@ -13,7 +13,7 @@ router = APIRouter()
 
 @router.get('/activities/', response_model=schemas.ActivityListResultSchemas)
 async def get_activities(session: AsyncSession = Depends(get_async_session)):
-    query = select(models.activity)
+    query = models.activity.select()
     response = await session.execute(query)
     activities = response.all()
     return {
@@ -33,15 +33,20 @@ async def get_activity(activity_id: int, session: AsyncSession = Depends(get_asy
 
 @router.get('/locations/',response_model=schemas.LocationListResultSchemas)
 async def get_locations(session: AsyncSession = Depends(get_async_session)):
-    query = select(
-        models.location.c.id,
-        models.location.c.name,
-        models.activity.c.id.label('activity_id'),
-        models.activity.c.name.label('activity_name')
-    ).join(models.activity)
+    query = models.location.select()
     response = await session.execute(query)
     locations = response.all()
     return {
         'status': 'access',
-        'result': locations
+        'result': locations,
+    }
+
+@router.get('/locations/{location_id}/', response_model=schemas.LocationItemResultSchema)
+async def get_location(location_id: int, session: AsyncSession = Depends(get_async_session)):
+    query = models.location.select().where(models.location.c.id == location_id)
+    response = await session.execute(query)
+    location = response.first()
+    return {
+        'status': 'access',
+        'result': location,
     }

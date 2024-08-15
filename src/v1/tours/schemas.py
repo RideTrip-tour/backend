@@ -11,18 +11,18 @@ class BaseModelSchema(BaseModel):
 class ActivitySchema(BaseModelSchema):
     pass
 
-
 class ActivityListResultSchemas(BaseResultSchema):
     result: list[ActivitySchema]
 
 class ActivityItemResultSchema(BaseResultSchema):
     result: ActivitySchema | None
 
+
 class LocationSchema(BaseModelSchema):
-    activity_id: int
-    activity_name: str
-
-
+    pass
 
 class LocationListResultSchemas(BaseResultSchema):
     result: list[LocationSchema]
+
+class LocationItemResultSchema(BaseResultSchema):
+    result: LocationSchema | None
