@@ -1,18 +1,15 @@
 from sqlalchemy import Column, Integer, ForeignKey, String, Table
 
-from src.database import metadata
+from src.database import Base
 
-activity = Table(
-    'activities',
-    metadata,
-    Column('id', Integer, primary_key=True, autoincrement=True),
-    Column('name', String)
-)
+class Activity(Base):
+    __tablename__ = 'activities'
 
-location = Table(
-    'locations',
-    metadata,
-Column('id', Integer, primary_key=True, autoincrement=True),
-    Column('name', String),
-    Column('activity_id', ForeignKey('activities.id')),
-)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String)
+
+class Location(Base):
+    __tablename__ = 'locations'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String)
