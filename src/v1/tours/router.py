@@ -12,8 +12,7 @@ router = APIRouter()
 @router.get('/activities/', response_model=schemas.ActivityListResultSchemas)
 async def get_activities(session: AsyncSession = Depends(get_async_session)):
     query = select(models.Activity)
-    response = await session.execute(query)
-    activities = response.all()
+    activities = await session.scalars(query)
     return {
         'status': 'access',
         'result': activities,
@@ -21,9 +20,8 @@ async def get_activities(session: AsyncSession = Depends(get_async_session)):
 
 @router.get('/activities/{activity_id}/', response_model=schemas.ActivityItemResultSchema)
 async def get_activity(activity_id: int, session: AsyncSession = Depends(get_async_session)):
-    query = select(models.Activity).where(models.Activity.id == activity_id)
-    response = await session.execute(query)
-    activity = response.first()
+    query = select(models.Activity).filter_by(id=activity_id)
+    activity = await session.scalar(query)
     return {
         'status': 'access',
         'result': activity,
@@ -32,8 +30,7 @@ async def get_activity(activity_id: int, session: AsyncSession = Depends(get_asy
 @router.get('/locations/',response_model=schemas.LocationListResultSchemas)
 async def get_locations(session: AsyncSession = Depends(get_async_session)):
     query = select(models.Location)
-    response = await session.execute(query)
-    locations = response.all()
+    locations = await session.scalars(query)
     return {
         'status': 'access',
         'result': locations,
@@ -41,9 +38,8 @@ async def get_locations(session: AsyncSession = Depends(get_async_session)):
 
 @router.get('/locations/{location_id}/', response_model=schemas.LocationItemResultSchema)
 async def get_location(location_id: int, session: AsyncSession = Depends(get_async_session)):
-    query = select(models.Location).where(models.Location.id == location_id)
-    response = await session.execute(query)
-    location = response.first()
+    query = select(models.Location).filter_by(id=location_id)
+    location = await session.scalar(query)
     return {
         'status': 'access',
         'result': location,
