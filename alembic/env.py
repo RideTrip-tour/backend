@@ -13,26 +13,18 @@ from alembic import context
 
 sys.path.append(os.path.join(sys.path[0], 'src'))
 
-from src.database import Base
+from src.database import metadata
 from src.models import *
-
-load_dotenv()
+from src.config import DATABASE_DIALECT, DATABASE_DRIVER, DATABASE_USER, DATABASE_PASS, DATABASE_HOST, \
+    DATABASE_PORT, DATABASE_NAME
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
-# Получите переменные окружения
-database_dialect = os.getenv('DATABASE_DIALECT')
-database_driver = os.getenv('DATABASE_DRIVER')
-postgres_user = os.getenv('POSTGRES_USER')
-postgres_password = os.getenv('POSTGRES_PASSWORD')
-postgres_host = os.getenv('POSTGRES_HOST')
-postgres_port = os.getenv('POSTGRES_PORT')
-postgres_db = os.getenv('POSTGRES_DB')
 
 # Формируйте строку подключения
-sqlalchemy_url = f"{database_dialect}+{database_driver}://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}?async_fallback=True"
+sqlalchemy_url = f"{DATABASE_DIALECT}+{DATABASE_DRIVER}://{DATABASE_USER}:{DATABASE_PASS}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}?async_fallback=True"
 
 # Установите строку подключения в конфиг
 config.set_main_option('sqlalchemy.url', sqlalchemy_url)
@@ -47,7 +39,7 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 
-target_metadata = Base.metadata
+target_metadata = metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

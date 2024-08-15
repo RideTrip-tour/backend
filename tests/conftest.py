@@ -5,7 +5,7 @@ import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from src.main import app
-from src.database import Base, DATABASE_URL, get_async_session
+from src.database import metadata, DATABASE_URL, get_async_session
 
 DATABASE_URL_TEST = DATABASE_URL._replace(database='rtt_test')
 
@@ -37,7 +37,7 @@ async def async_db_connection():
     )
     # Создание таблиц
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(metadata.create_all)
 
     async with engine.connect() as conn:
         try:
@@ -49,7 +49,7 @@ async def async_db_connection():
 
     # Удаление таблиц
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(metadata.drop_all)
 
     await engine.dispose()
 

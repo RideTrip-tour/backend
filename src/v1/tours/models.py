@@ -1,21 +1,18 @@
-from sqlalchemy import Column, Integer, ForeignKey, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, ForeignKey, String, Table
 
-from src.database import Base, metadata
+from src.database import metadata
 
+activity = Table(
+    'activities',
+    metadata,
+    Column('id', Integer, primary_key=True, autoincrement=True),
+    Column('name', String)
+)
 
-class TourORM(Base):
-    __tablename__ = 'tours'
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String)
-    locations = relationship('LocationORM', back_populates='tour')
-
-
-class LocationORM(Base):
-    __tablename__ = 'locations'
-    metadata = metadata
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String)
-    tour_id = Column(ForeignKey('tours.id'))
-    tour = relationship(TourORM, back_populates='locations')
+location = Table(
+    'locations',
+    metadata,
+Column('id', Integer, primary_key=True, autoincrement=True),
+    Column('name', String),
+    Column('activity_id', ForeignKey('activities.id')),
+)

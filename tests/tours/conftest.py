@@ -1,42 +1,47 @@
 import pytest
 import pytest_asyncio
+from sqlalchemy import insert, select
 
-from src.v1.tours.models import TourORM, LocationORM
+from src.v1.tours import models
 
 
 @pytest.fixture
-def tour_data():
-    return {'name': 'test_tour'}
+def activity_data():
+    return {'name': 'test_activity'}
 
 @pytest_asyncio.fixture
-async def tour(session, tour_data):
-    tour = TourORM(**tour_data)
-    session.add(tour)
+async def activity(session, activity_data):
+    stmt = insert(models.activity).values(**activity_data)
+    await session.execute(stmt)
     await session.commit()
-    await session.refresh(tour)
-    return tour
 
+    query = models.activity.select()
+    result = await session.execute(query)
+    return result.first()
 
 @pytest_asyncio.fixture
-async def location(session, tour):
-    location = LocationORM(name='test_location', tour=tour)
-    session.add(location)
+async def list_activities(session):
+    stmt = insert(models.activity).values([{'name': f'activity_{i}'} for i in range(10)])
+    await session.execute(stmt)
     await session.commit()
-    await session.refresh(location)
-    return location
 
+
+@pytest.fixture
+def location_data():
+    return {'name': 'test_activity'}
 
 @pytest_asyncio.fixture
-async def list_tours(session):
-    tours = [TourORM(name=f'tour_{i}') for i in range(10)]
-    session.add_all(tours)
+async def location(session, location_data):
+    stmt = insert(models.activity).values(**activity_data)
+    await session.execute(stmt)
     await session.commit()
-    return tours
 
+    query = select(models.activity)
+    result = await session.execute(query)
+    return result.first()
 
 @pytest_asyncio.fixture
-async def list_locations(session):
-    locations = [LocationORM(name=f'location_{i}') for i in range(10)]
-    session.add_all(locations)
+async def list_locations(session, activity, list_activities):
+    stmt = insert(models.location).values([{'name': f'location_{i}', "activity_id": i+1} for i in range(10)])
+    await session.execute(stmt)
     await session.commit()
-    return locations
