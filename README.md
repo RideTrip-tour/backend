@@ -12,3 +12,12 @@
  - sqlalchemy
  - pytest-asyncio
  - poetry
+ - alembic
+
+### Миграции
+Все созданные модели таблиц базы данных должны быть импортированы в src/models.py
+
+- **Автогенерация миграций** - ```alembic revision --autogenerate```
+- **Применить миграции** - ```alembic upgrade head```
+- **Откатить миграции** - ```alembic downgrade {идентификатор ревизии}```
+
