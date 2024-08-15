@@ -8,17 +8,20 @@ class BaseModelSchema(BaseModel):
     name: str
 
 
-class TourSchema(BaseModelSchema):
+class ActivitySchema(BaseModelSchema):
     pass
 
-class TourListResultSchemas(BaseResultSchema):
-    result: list[TourSchema]
 
-class TourItemResultSchema(BaseResultSchema):
-    result: TourSchema | None
+class ActivityListResultSchemas(BaseResultSchema):
+    result: list[ActivitySchema]
+
+class ActivityItemResultSchema(BaseResultSchema):
+    result: ActivitySchema | None
 
 class LocationSchema(BaseModelSchema):
-    tour: TourSchema
+    activity_id: int
+    activity_name: str
+
 
 
 class LocationListResultSchemas(BaseResultSchema):

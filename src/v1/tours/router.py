@@ -1,34 +1,47 @@
 from fastapi import APIRouter, Depends
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from src.database import get_async_session
+from tests.tours.conftest import activity
 
-from . import crud, models, schemas
+from . import  models, schemas
 
 router = APIRouter()
 
 
-@router.get('/tours/', response_model=schemas.TourListResultSchemas)
-async def get_tours(session: AsyncSession = Depends(get_async_session)):
-    tours = await crud.get_items(session, models.TourORM)
+@router.get('/activities/', response_model=schemas.ActivityListResultSchemas)
+async def get_activities(session: AsyncSession = Depends(get_async_session)):
+    query = select(models.activity)
+    response = await session.execute(query)
+    activities = response.all()
     return {
         'status': 'access',
-        'result': tours.all(),
+        'result': activities,
     }
 
-@router.get('/tours/{tour_id}/', response_model=schemas.TourItemResultSchema)
-async def get_tour(tour_id: int, session: AsyncSession = Depends(get_async_session)):
-    tour = await crud.get_item(session, models.TourORM, tour_id)
+@router.get('/activities/{activity_id}/', response_model=schemas.ActivityItemResultSchema)
+async def get_activity(activity_id: int, session: AsyncSession = Depends(get_async_session)):
+    query = models.activity.select().where(models.activity.c.id == activity_id)
+    response = await session.execute(query)
+    activity = response.first()
     return {
         'status': 'access',
-        'result': tour,
+        'result': activity,
     }
 
-@router.get('/locations/', response_model=schemas.LocationListResultSchemas)
-async def get_location(session: AsyncSession = Depends(get_async_session)):
-    locations = await crud.get_items(session, models.LocationORM)
+@router.get('/locations/',response_model=schemas.LocationListResultSchemas)
+async def get_locations(session: AsyncSession = Depends(get_async_session)):
+    query = select(
+        models.location.c.id,
+        models.location.c.name,
+        models.activity.c.id.label('activity_id'),
+        models.activity.c.name.label('activity_name')
+    ).join(models.activity)
+    response = await session.execute(query)
+    locations = response.all()
     return {
         'status': 'access',
-        'result': locations.all(),
+        'result': locations
     }
-
