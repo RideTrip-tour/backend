@@ -21,3 +21,5 @@
 - **Применить миграции** - ```alembic upgrade head```
 - **Откатить миграции** - ```alembic downgrade {идентификатор ревизии}```
 
+### Ендпоинты
+* [Endpoints](https://github.com/RideTrip-tour/Wiki/blob/main/Endpoints.md)
