@@ -1,1 +1,1 @@
-from v1.tours import models
+from v1.tours import models  # noqa:F401

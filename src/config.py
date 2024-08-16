@@ -18,4 +18,3 @@ DATABASE_URL = URL.create(
     port=DATABASE_PORT,
     database=DATABASE_NAME,
 )
-
