@@ -1,9 +1,11 @@
+from random import randint
+
 import pytest
 import pytest_asyncio
-from sqlalchemy import insert, select
+from sqlalchemy import insert
 
-from src.v1.tours import models
-from tests.tours.consts import AMOUNT_ITEMS_FOR_TEST
+from src.v1.tours import models, schemas
+from tests.consts import AMOUNT_ITEMS_FOR_TEST
 
 
 @pytest.fixture
@@ -12,37 +14,59 @@ def activity_data():
 
 @pytest_asyncio.fixture
 async def activity(session, activity_data):
-    stmt = insert(models.activity).values(**activity_data)
-    await session.execute(stmt)
+    activity = models.Activity(**activity_data)
+    session.add(activity)
     await session.commit()
-
-    query = models.activity.select()
-    result = await session.execute(query)
-    return result.first()
+    await session.refresh(activity)
+    return activity
 
 @pytest_asyncio.fixture
 async def list_activities(session):
-    stmt = insert(models.activity).values([{'name': f'activity_{i}'} for i in range(AMOUNT_ITEMS_FOR_TEST)])
-    await session.execute(stmt)
+    activities = [models.Activity(name=f'activity_{i}') for i in range(AMOUNT_ITEMS_FOR_TEST)]
+    session.add_all(activities)
     await session.commit()
 
 
 @pytest.fixture
 def location_data():
-    return {'name': 'test_activity'}
+    return {'name': 'test_location'}
 
 @pytest_asyncio.fixture
 async def location(session, location_data):
-    stmt = insert(models.location).values(**location_data)
-    await session.execute(stmt)
+    location = models.Location(**location_data)
+    session.add(location)
     await session.commit()
-
-    query = select(models.location)
-    result = await session.execute(query)
-    return result.first()
+    await session.refresh(location)
+    return location
 
 @pytest_asyncio.fixture
-async def list_locations(session, activity, list_activities):
-    stmt = insert(models.location).values([{'name': f'location_{i}', "activity_id": i+1} for i in range(AMOUNT_ITEMS_FOR_TEST)])
-    await session.execute(stmt)
+async def list_locations(session):
+    locations = [models.Location(name=f'location_{i}') for i in range(AMOUNT_ITEMS_FOR_TEST)]
+    session.add_all(locations)
+    await session.commit()
+
+@pytest_asyncio.fixture
+async def activities_locations(session, list_locations, list_activities, location, activity):
+    r: int = AMOUNT_ITEMS_FOR_TEST
+    datas = set()
+    for i in range(1, (r // 2)):
+        data_loc = (location.id, i)
+        data_act = (i, activity.id)
+        datas.update((data_loc, data_act,))
+
+    while len(datas) < r:
+        data = (
+            randint(1, r), # loc_id
+            randint(1, r), # activ_id
+        )
+        datas.add(data)
+
+    for data in datas:
+        stmt = insert(models.activities_locations_table).values(
+            {
+                'location_id': data[0],
+                'activity_id': data[1]
+            }
+        )
+        await session.execute(stmt)
     await session.commit()

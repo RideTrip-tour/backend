@@ -1,4 +1,4 @@
-from tests.tours.consts import AMOUNT_ITEMS_FOR_TEST
+from tests.consts import AMOUNT_ITEMS_FOR_TEST
 
 
 async def _check_page_with_list_result(client, url):

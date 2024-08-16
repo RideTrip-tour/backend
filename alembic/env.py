@@ -1,11 +1,7 @@
-import glob
-import importlib
 import os
 import sys
 from logging.config import fileConfig
-from pathlib import Path
 
-from dotenv import load_dotenv
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
@@ -13,7 +9,7 @@ from alembic import context
 
 sys.path.append(os.path.join(sys.path[0], 'src'))
 
-from src.database import metadata
+from src.database import Base
 from src.models import *
 from src.config import DATABASE_DIALECT, DATABASE_DRIVER, DATABASE_USER, DATABASE_PASS, DATABASE_HOST, \
     DATABASE_PORT, DATABASE_NAME
@@ -39,7 +35,7 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 
-target_metadata = metadata
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
