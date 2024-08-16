@@ -46,12 +46,13 @@ async def list_locations(session):
     await session.commit()
 
 @pytest_asyncio.fixture
-async def activities_locations(session, list_locations, list_activities, location):
+async def activities_locations(session, list_locations, list_activities, location, activity):
     r: int = AMOUNT_ITEMS_FOR_TEST
     datas = set()
     for i in range(1, (r // 2)):
-        data = (location.id, i)
-        datas.add(data)
+        data_loc = (location.id, i)
+        data_act = (i, activity.id)
+        datas.update((data_loc, data_act,))
 
     while len(datas) < r:
         data = (
@@ -59,6 +60,7 @@ async def activities_locations(session, list_locations, list_activities, locatio
             randint(1, r), # activ_id
         )
         datas.add(data)
+
     for data in datas:
         stmt = insert(models.activities_locations_table).values(
             {
