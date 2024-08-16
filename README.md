@@ -14,8 +14,10 @@
  - pytest-asyncio
  - sqlalchemy
 
-### Коммиты проверяются:
- - balck
+### Коммиты проверяются pre-commit:
+ Перед началом работу нужно выполнить команду ```pre-commit install```
+
+ - black
  - flake8
  - isort
  - mypy
