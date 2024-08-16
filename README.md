@@ -14,6 +14,12 @@
  - pytest-asyncio
  - sqlalchemy
 
+### Коммиты проверяются:
+ - balck
+ - flake8
+ - isort
+ - mypy
+
 ### Миграции
 Все созданные модели таблиц базы данных должны быть импортированы в src/models.py
 
