@@ -12,7 +12,7 @@ DATABASE_URL_TEST = DATABASE_URL._replace(database='rtt_test')
 
 @pytest_asyncio.fixture
 async def async_session_maker(async_db_connection):
-    yield async_sessionmaker(async_db_connection)
+    yield async_sessionmaker(async_db_connection, expire_on_commit=False)
 
 
 @pytest_asyncio.fixture

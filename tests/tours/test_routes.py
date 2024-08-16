@@ -1,28 +1,52 @@
 import pytest
+from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 
+from src.v1.tours import models
+from .conftest import activity
 from .utils import _check_page_with_list_result, _check_page_with_item_result
 
 
 @pytest.mark.asyncio
 class TestActivities:
+    base_url = '/v1/activities'
     async def test_list_activities(self, client, list_activities):
-        url = '/v1/activities/'
+        url = self.base_url
         await _check_page_with_list_result(client, url)
 
 
     async def test_retrieve_activity(self, client, activity, activity_data):
         activity_id = activity.id
-        url = f'/v1/activities/{activity_id}/'
+        url = f'{self.base_url}/{activity_id}/'
         await _check_page_with_item_result(client, url, activity_id, activity_data)
+
+    async def test_list_activities_with_param_location(self, activities_locations, client, list_activities, session, location):
+        assert location is not None, 'Локация не добавлена'
+        url = f'{self.base_url}?loc={location.id}'
+        response = await client.get(url)
+
+        # Получаем все id активностей из result
+        activity_ids_result = [item.get('id') for item in response.json().get('result')]
+
+        # Получаем из БД id активностей для заданной локации
+        query = select(
+            models.activities_locations_table.c.activity_id
+        ).where(
+            models.activities_locations_table.c.location_id == location.id
+        ).order_by(models.activities_locations_table.c.activity_id)
+        result = await session.execute(query)
+        activity_ids_current = result.scalars().unique().all()
+        assert activity_ids_result == activity_ids_current, f'В "result" есть Активность не относящаяся к локации {location.name}'
 
 
 @pytest.mark.asyncio
 class TestLocation:
+    base_url = '/v1/locations'
     async def test_list_locations(self, client, list_locations):
-        url = '/v1/locations/'
+        url = self.base_url
         await _check_page_with_list_result(client, url)
 
     async def test_retrieve_location(self, client, location, location_data):
         location_id = location.id
-        url = f'/v1/locations/{location.id}/'
+        url = f'{self.base_url}/{location_id}/'
         await _check_page_with_item_result(client, url, location_id, location_data)
