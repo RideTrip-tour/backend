@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 class BaseResultSchema(BaseModel):
     status: str
@@ -19,7 +19,7 @@ class ActivityItemResultSchema(BaseResultSchema):
 
 
 class LocationSchema(BaseModelSchema):
-    pass
+    model_config = ConfigDict(from_attributes=True)
 
 class LocationListResultSchemas(BaseResultSchema):
     result: list[LocationSchema]
