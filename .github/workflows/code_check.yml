@@ -46,4 +46,4 @@ jobs:
 
     - name: Run pre-commit
       run: |
-        poetry run pre-commit
+        poetry run pre-commit --
