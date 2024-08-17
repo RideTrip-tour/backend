@@ -1,7 +1,7 @@
 """create tables Location, Activity, activities_locations_table
 
 Revision ID: df7eefbb439f
-Revises: 
+Revises:
 Create Date: 2024-08-16 13:31:08.348611
 
 """

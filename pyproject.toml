@@ -19,6 +19,9 @@ alembic = "^1.13.2"
 python-dotenv = "^1.0.1"
 
 
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.8.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
@@ -31,3 +34,17 @@ python_files = ['test_*.py', ]
 addopts = "-vv"
 asyncio_mode = 'auto'
 
+
+[tool.isort]
+profile = "black"
+line_length = 79
+remove_redundant_aliases = true
+skip_glob = ["alembic/versions/*.py"]
+src_paths = ["src"]
+
+[tool.black]
+line-length = 79
+target-version = ['py312']
+
+[tool.mypy]
+exclude = 'alembic/.'

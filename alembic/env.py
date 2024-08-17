@@ -2,17 +2,22 @@ import os
 import sys
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
 from alembic import context
+from sqlalchemy import engine_from_config, pool
 
-sys.path.append(os.path.join(sys.path[0], 'src'))
+sys.path.append(os.path.join(sys.path[0], "src"))
 
+from src.config import (
+    DATABASE_DIALECT,
+    DATABASE_DRIVER,
+    DATABASE_HOST,
+    DATABASE_NAME,
+    DATABASE_PASS,
+    DATABASE_PORT,
+    DATABASE_USER,
+)
 from src.database import Base
-from src.models import *
-from src.config import DATABASE_DIALECT, DATABASE_DRIVER, DATABASE_USER, DATABASE_PASS, DATABASE_HOST, \
-    DATABASE_PORT, DATABASE_NAME
+from src.models import *  # noqa:F403
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -23,7 +28,7 @@ config = context.config
 sqlalchemy_url = f"{DATABASE_DIALECT}+{DATABASE_DRIVER}://{DATABASE_USER}:{DATABASE_PASS}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}?async_fallback=True"
 
 # Установите строку подключения в конфиг
-config.set_main_option('sqlalchemy.url', sqlalchemy_url)
+config.set_main_option("sqlalchemy.url", sqlalchemy_url)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
