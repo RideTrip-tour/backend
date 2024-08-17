@@ -11,7 +11,8 @@ class BaseModelSchema(BaseModel):
 
 
 class ActivitySchema(BaseModelSchema):
-    pass
+    model_config = ConfigDict(from_attributes=True)
+    locations: list[BaseModelSchema]
 
 
 class ActivityListResultSchemas(BaseResultSchema):
@@ -24,6 +25,7 @@ class ActivityItemResultSchema(BaseResultSchema):
 
 class LocationSchema(BaseModelSchema):
     model_config = ConfigDict(from_attributes=True)
+    activities: list[BaseModelSchema]
 
 
 class LocationListResultSchemas(BaseResultSchema):

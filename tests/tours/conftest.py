@@ -9,17 +9,40 @@ from src.v1.tours import models
 
 
 @pytest.fixture
-def activity_data():
+def activity_data() -> dict:
     return {"name": "test_activity"}
 
 
 @pytest_asyncio.fixture
 async def activity(session, activity_data):
+    """Создает и возвращает модель Активности"""
     activity = models.Activity(**activity_data)
     session.add(activity)
     await session.commit()
     await session.refresh(activity)
     return activity
+
+
+@pytest_asyncio.fixture
+async def activity_with_locations(
+    session, activities_locations_table_add_row, activity
+):
+    """"""
+    await session.refresh(
+        activity,
+        [
+            "locations",
+        ],
+    )
+    return activity
+
+
+@pytest.fixture
+def activity_data_with_locations(activity_data, location_data, location):
+    return {
+        **activity_data,
+        "locations": [{"id": location.id, **location_data}],
+    }
 
 
 @pytest_asyncio.fixture
@@ -44,6 +67,27 @@ async def location(session, location_data):
     await session.commit()
     await session.refresh(location)
     return location
+
+
+@pytest_asyncio.fixture
+async def location_with_activity(
+    session, activities_locations_table_add_row, location
+):
+    await session.refresh(
+        location,
+        [
+            "activities",
+        ],
+    )
+    return location
+
+
+@pytest.fixture
+def location_data_with_activity(activity_data, location_data, activity):
+    return {
+        **location_data,
+        "activities": [{"id": activity.id, **activity_data}],
+    }
 
 
 @pytest_asyncio.fixture
@@ -84,4 +128,14 @@ async def activities_locations(
             {"location_id": data[0], "activity_id": data[1]}
         )
         await session.execute(stmt)
+    await session.commit()
+
+
+@pytest_asyncio.fixture
+async def activities_locations_table_add_row(session, activity, location):
+    stmt = insert(models.activities_locations_table).values(
+        activity_id=activity.id,
+        location_id=location.id,
+    )
+    await session.execute(stmt)
     await session.commit()

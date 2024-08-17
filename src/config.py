@@ -1,6 +1,9 @@
 import os
 
+from dotenv import load_dotenv
 from sqlalchemy import URL
+
+load_dotenv()
 
 # DATABASE
 DATABASE_DIALECT = os.getenv("DATABASE_DIALECT", "postgresql")

@@ -12,13 +12,15 @@ class TestActivities:
 
     async def test_list_activities(self, client, list_activities):
         url = self.base_url
-        await _check_page_with_list_result(client, url)
+        await _check_page_with_list_result(client, url, "locations")
 
-    async def test_retrieve_activity(self, client, activity, activity_data):
-        activity_id = activity.id
+    async def test_retrieve_activity(
+        self, client, activity_with_locations, activity_data_with_locations
+    ):
+        activity_id = activity_with_locations.id
         url = f"{self.base_url}/{activity_id}"
         await _check_page_with_item_result(
-            client, url, activity_id, activity_data
+            client, url, activity_id, activity_data_with_locations
         )
 
     async def test_list_activities_with_param_location(
@@ -55,16 +57,18 @@ class TestLocation:
 
     async def test_list_locations(self, client, list_locations):
         url = self.base_url
-        await _check_page_with_list_result(client, url)
+        await _check_page_with_list_result(client, url, "activities")
 
-    async def test_retrieve_location(self, client, location, location_data):
-        location_id = location.id
+    async def test_retrieve_location(
+        self, client, location_with_activity, location_data_with_activity
+    ):
+        location_id = location_with_activity.id
         url = f"{self.base_url}/{location_id}"
         await _check_page_with_item_result(
-            client, url, location_id, location_data
+            client, url, location_id, location_data_with_activity
         )
 
-    async def test_list_activities_with_param_location(
+    async def test_list_location_with_param_activity(
         self, activities_locations, client, list_activities, session, activity
     ):
         assert activity is not None, "Активность не добавлена"
@@ -77,16 +81,12 @@ class TestLocation:
         ]
 
         # Получаем из БД id локаций для заданной активности
-        query = (
-            select(models.activities_locations_table.c.location_id)
-            .where(
-                models.activities_locations_table.c.activity_id == activity.id
-            )
-            .order_by(models.activities_locations_table.c.location_id)
+        query = select(models.activities_locations_table.c.location_id).where(
+            models.activities_locations_table.c.activity_id == activity.id
         )
         result = await session.execute(query)
         location_ids_current = result.scalars().unique().all()
-        assert location_ids_result == location_ids_current, (
+        assert set(location_ids_result) == set(location_ids_current), (
             f'В "result" есть Локация не относящаяся к '
             f"активности {activity.name}"
         )
