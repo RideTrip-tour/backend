@@ -137,11 +137,11 @@ async def activities_locations(
         )
         datas.add(data)
 
+    values: list[dict] = []
     for data in datas:
-        stmt = insert(models.activities_locations_table).values(
-            {"location_id": data[0], "activity_id": data[1]}
-        )
-        await session.execute(stmt)
+        values.append({"location_id": data[0], "activity_id": data[1]})
+    stmt = insert(models.activities_locations_table).values(values)
+    await session.execute(stmt)
     await session.commit()
 
 
