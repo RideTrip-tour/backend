@@ -18,8 +18,11 @@ async def get_list_locations(
     :return:
         Список локаций
     """
-    query = select(models.Location).options(
-        joinedload(models.Location.activities)
+    query = select(
+        models.Location,
+    ).options(
+        joinedload(models.Location.activities),
+        joinedload(models.Location.country),
     )
     if act:
         query = query.where(
@@ -43,7 +46,9 @@ async def get_list_activities(
         Список активностей
     """
     query = select(models.Activity).options(
-        joinedload(models.Activity.locations)
+        joinedload(models.Activity.locations).joinedload(
+            models.Location.country
+        )
     )
     if loc:
         query = query.where(
@@ -67,7 +72,11 @@ async def get_activity(
     """
     query = (
         select(models.Activity)
-        .options(joinedload(models.Activity.locations))
+        .options(
+            joinedload(models.Activity.locations).joinedload(
+                models.Location.country
+            )
+        )
         .filter_by(id=activity_id)
     )
     response = await session.execute(query)
@@ -88,7 +97,10 @@ async def get_location(
     """
     query = (
         select(models.Location)
-        .options(joinedload(models.Location.activities))
+        .options(
+            joinedload(models.Location.activities),
+            joinedload(models.Location.country),
+        )
         .filter_by(id=location_id)
     )
     response = await session.execute(query)

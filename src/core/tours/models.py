@@ -22,6 +22,16 @@ class Activity(Base):
     )
 
 
+class Country(Base):
+    __tablename__ = "countries"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String)
+
+    def __str__(self):
+        return self.name
+
+
 class Location(Base):
     __tablename__ = "locations"
 
@@ -31,3 +41,5 @@ class Location(Base):
     activities: Mapped[list["Activity"]] = relationship(
         secondary=activities_locations_table, back_populates="locations"
     )
+    country_id = Column(ForeignKey("countries.id"), nullable=False)
+    country: Mapped["Country"] = relationship()
