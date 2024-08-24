@@ -3,7 +3,11 @@ from sqlalchemy import select
 
 from src.core.tours import models
 
-from .utils import _check_page_with_item_result, _check_page_with_list_result
+from .utils import (
+    _check_response_with_item_result,
+    _check_response_with_list_result,
+    _check_response_with_wrong_param,
+)
 
 
 @pytest.mark.asyncio
@@ -12,21 +16,21 @@ class TestActivities:
 
     async def test_list_activities(self, client, list_activities):
         url = self.base_url
-        await _check_page_with_list_result(client, url, "locations")
+        await _check_response_with_list_result(client, url, "locations")
 
     async def test_retrieve_activity(
         self, client, activity_with_locations, activity_data_with_locations
     ):
         activity_id = activity_with_locations.id
         url = f"{self.base_url}/{activity_id}"
-        await _check_page_with_item_result(
+        await _check_response_with_item_result(
             client, url, activity_id, activity_data_with_locations
         )
 
     async def test_list_activities_with_param_location(
         self, activities_locations, client, list_activities, session, location
     ):
-        assert location is not None, "Локация не добавлена"
+        assert location.id is not None, "Локация не добавлена"
         url = f"{self.base_url}?loc={location.id}"
         response = await client.get(url)
 
@@ -50,6 +54,10 @@ class TestActivities:
             f"к локации {location.name}"
         )
 
+    async def test_list_activity_with_wrong_param(self, client, session):
+        url = f"{self.base_url}?loc=9999"
+        await _check_response_with_wrong_param(client, url)
+
 
 @pytest.mark.asyncio
 class TestLocation:
@@ -57,21 +65,21 @@ class TestLocation:
 
     async def test_list_locations(self, client, list_locations):
         url = self.base_url
-        await _check_page_with_list_result(client, url, "activities")
+        await _check_response_with_list_result(client, url, "activities")
 
     async def test_retrieve_location(
         self, client, location_with_activity, location_data_with_activity
     ):
         location_id = location_with_activity.id
         url = f"{self.base_url}/{location_id}"
-        await _check_page_with_item_result(
+        await _check_response_with_item_result(
             client, url, location_id, location_data_with_activity
         )
 
     async def test_list_location_with_param_activity(
         self, activities_locations, client, list_activities, session, activity
     ):
-        assert activity is not None, "Активность не добавлена"
+        assert activity.id is not None, "Активность не добавлена"
         url = f"{self.base_url}?act={activity.id}"
         response = await client.get(url)
 
@@ -90,3 +98,7 @@ class TestLocation:
             f'В "result" есть Локация не относящаяся к '
             f"активности {activity.name}"
         )
+
+    async def test_list_location_with_wrong_param(self, client, session):
+        url = f"{self.base_url}?act=9999"
+        await _check_response_with_wrong_param(client, url)

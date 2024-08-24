@@ -12,7 +12,7 @@ def _validate_result(result: list[dict], related: str):
     return True
 
 
-async def _check_page_with_list_result(client, url: str, related: str):
+async def _check_response_with_list_result(client, url: str, related: str):
     response = await client.get(url)
     assert response.status_code == 200, f"Страница {url} не возвращает код 200"
     assert (
@@ -30,7 +30,7 @@ async def _check_page_with_list_result(client, url: str, related: str):
     assert _validate_result(result, related)
 
 
-async def _check_page_with_item_result(client, url, item_id, data):
+async def _check_response_with_item_result(client, url, item_id, data):
     response = await client.get(url)
     assert response.status_code == 200, f"Страница {url} не возвращает код 200"
     assert (
@@ -44,3 +44,11 @@ async def _check_page_with_item_result(client, url, item_id, data):
         "id": item_id,
         **data,
     }, f'Данные в "result" не соответствую объекту {url}'
+
+
+async def _check_response_with_wrong_param(client, url):
+    response = await client.get(url)
+    assert response.json().get("status") == "access"
+    assert (
+        response.json().get("result") == []
+    ), 'В "result" должен быть пустой список'
