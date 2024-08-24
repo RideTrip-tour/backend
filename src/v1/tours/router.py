@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
 
 from src.database import get_async_session
 
-from . import models, schemas
+from ...core.tours import schemas
+from . import crud
 
 router = APIRouter()
 
@@ -14,15 +13,7 @@ router = APIRouter()
 async def get_activities(
     loc: int | None = None, session: AsyncSession = Depends(get_async_session)
 ):
-    query = select(models.Activity).options(
-        joinedload(models.Activity.locations)
-    )
-    if loc:
-        query = query.where(
-            models.Activity.locations.any(models.Location.id == loc)
-        )
-    response = await session.execute(query)
-    activities = response.scalars().unique()
+    activities = await crud.get_list_activities(session, loc=loc)
     return {
         "status": "access",
         "result": activities,
@@ -36,13 +27,7 @@ async def get_activities(
 async def get_activity(
     activity_id: int, session: AsyncSession = Depends(get_async_session)
 ):
-    query = (
-        select(models.Activity)
-        .options(joinedload(models.Activity.locations))
-        .filter_by(id=activity_id)
-    )
-    response = await session.execute(query)
-    activity = response.scalar()
+    activity = await crud.get_activity(session, activity_id)
     return {
         "status": "access",
         "result": activity,
@@ -53,15 +38,7 @@ async def get_activity(
 async def get_locations(
     act: int | None = None, session: AsyncSession = Depends(get_async_session)
 ):
-    query = select(models.Location).options(
-        joinedload(models.Location.activities)
-    )
-    if act:
-        query = query.where(
-            models.Location.activities.any(models.Activity.id == act)
-        )
-    response = await session.execute(query)
-    locations = response.scalars().unique()
+    locations = await crud.get_list_locations(session, act=act)
     return {
         "status": "access",
         "result": locations,
@@ -74,13 +51,7 @@ async def get_locations(
 async def get_location(
     location_id: int, session: AsyncSession = Depends(get_async_session)
 ):
-    query = (
-        select(models.Location)
-        .options(joinedload(models.Location.activities))
-        .filter_by(id=location_id)
-    )
-    response = await session.execute(query)
-    location = response.scalar()
+    location = await crud.get_location(session, location_id)
     return {
         "status": "access",
         "result": location,

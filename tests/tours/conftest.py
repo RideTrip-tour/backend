@@ -5,7 +5,7 @@ import pytest_asyncio
 from sqlalchemy import insert
 from tests.consts import AMOUNT_ITEMS_FOR_TEST
 
-from src.v1.tours import models
+from src.core.tours import models
 
 
 @pytest.fixture

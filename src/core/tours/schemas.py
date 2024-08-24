@@ -16,7 +16,7 @@ class ActivitySchema(BaseModelSchema):
 
 
 class ActivityListResultSchemas(BaseResultSchema):
-    result: list[ActivitySchema]
+    result: list[ActivitySchema] | None
 
 
 class ActivityItemResultSchema(BaseResultSchema):
@@ -29,7 +29,7 @@ class LocationSchema(BaseModelSchema):
 
 
 class LocationListResultSchemas(BaseResultSchema):
-    result: list[LocationSchema]
+    result: list[LocationSchema] | None
 
 
 class LocationItemResultSchema(BaseResultSchema):
