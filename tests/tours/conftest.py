@@ -10,11 +10,12 @@ from src.v1.tours import models
 
 @pytest.fixture
 def activity_data() -> dict:
+    """Возвращает данные тестовой активности"""
     return {"name": "test_activity"}
 
 
 @pytest_asyncio.fixture
-async def activity(session, activity_data):
+async def activity(session, activity_data) -> models.Activity:
     """Создает и возвращает модель Активности"""
     activity = models.Activity(**activity_data)
     session.add(activity)
@@ -26,8 +27,8 @@ async def activity(session, activity_data):
 @pytest_asyncio.fixture
 async def activity_with_locations(
     session, activities_locations_table_add_row, activity
-):
-    """"""
+) -> models.Activity:
+    """Возвращает активность со связанными локациями"""
     await session.refresh(
         activity,
         [
@@ -38,7 +39,10 @@ async def activity_with_locations(
 
 
 @pytest.fixture
-def activity_data_with_locations(activity_data, location_data, location):
+def activity_data_with_locations(
+    activity_data, location_data, location
+) -> dict:
+    """Возвращает данные активности со списком локаций"""
     return {
         **activity_data,
         "locations": [{"id": location.id, **location_data}],
@@ -46,7 +50,8 @@ def activity_data_with_locations(activity_data, location_data, location):
 
 
 @pytest_asyncio.fixture
-async def list_activities(session):
+async def list_activities(session) -> None:
+    """Добавляет список активностей в БД"""
     activities = [
         models.Activity(name=f"activity_{i}")
         for i in range(AMOUNT_ITEMS_FOR_TEST)
@@ -56,12 +61,14 @@ async def list_activities(session):
 
 
 @pytest.fixture
-def location_data():
+def location_data() -> dict:
+    """Возвращает данные тестовой локации"""
     return {"name": "test_location"}
 
 
 @pytest_asyncio.fixture
-async def location(session, location_data):
+async def location(session, location_data) -> models.Location:
+    """Возвращает тестовую локацию"""
     location = models.Location(**location_data)
     session.add(location)
     await session.commit()
@@ -72,7 +79,8 @@ async def location(session, location_data):
 @pytest_asyncio.fixture
 async def location_with_activity(
     session, activities_locations_table_add_row, location
-):
+) -> models.Location:
+    """Возвращает тестовую локацию с активностями"""
     await session.refresh(
         location,
         [
@@ -83,7 +91,10 @@ async def location_with_activity(
 
 
 @pytest.fixture
-def location_data_with_activity(activity_data, location_data, activity):
+def location_data_with_activity(
+    activity_data, location_data, activity
+) -> dict:
+    """Возвращает данные с тестовой локации с активностью"""
     return {
         **location_data,
         "activities": [{"id": activity.id, **activity_data}],
@@ -91,7 +102,8 @@ def location_data_with_activity(activity_data, location_data, activity):
 
 
 @pytest_asyncio.fixture
-async def list_locations(session):
+async def list_locations(session) -> None:
+    """Создает список тестовых локаций"""
     locations = [
         models.Location(name=f"location_{i}")
         for i in range(AMOUNT_ITEMS_FOR_TEST)
@@ -103,9 +115,11 @@ async def list_locations(session):
 @pytest_asyncio.fixture
 async def activities_locations(
     session, list_locations, list_activities, location, activity
-):
+) -> None:
+    """Создает связи локаций и активностей.
+    Минимум AMOUNT_ITEMS_FOR_TEST // 2 - 1 связей"""
     r: int = AMOUNT_ITEMS_FOR_TEST
-    datas = set()
+    datas: set[tuple[int, int]] = set()
     for i in range(1, (r // 2)):
         data_loc = (location.id, i)
         data_act = (i, activity.id)
@@ -132,7 +146,10 @@ async def activities_locations(
 
 
 @pytest_asyncio.fixture
-async def activities_locations_table_add_row(session, activity, location):
+async def activities_locations_table_add_row(
+    session, activity, location
+) -> None:
+    """Создает связь тестовой локации с тестовой активностью"""
     stmt = insert(models.activities_locations_table).values(
         activity_id=activity.id,
         location_id=location.id,
