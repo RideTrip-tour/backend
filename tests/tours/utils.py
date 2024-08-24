@@ -40,8 +40,6 @@ async def _check_page_with_item_result(client, url, item_id, data):
     assert (
         "result" in response.json()
     ), f'Тело ответа {url} не содержит "result"'
-    print(data)
-    print(response.json().get("result"))
     assert response.json().get("result") == {
         "id": item_id,
         **data,
