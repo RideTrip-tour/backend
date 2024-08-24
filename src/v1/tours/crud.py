@@ -2,7 +2,7 @@ from sqlalchemy import Result, ScalarResult, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from . import models
+from ...core.tours import models
 
 
 async def get_list_locations(

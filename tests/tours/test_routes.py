@@ -1,7 +1,7 @@
 import pytest
 from sqlalchemy import select
 
-from src.v1.tours import models
+from src.core.tours import models
 
 from .utils import _check_page_with_item_result, _check_page_with_list_result
 

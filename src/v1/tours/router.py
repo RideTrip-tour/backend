@@ -3,7 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
 
-from . import crud, schemas
+from ...core.tours import schemas
+from . import crud
 
 router = APIRouter()
 
