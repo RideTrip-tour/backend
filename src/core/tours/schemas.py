@@ -21,21 +21,25 @@ class LocationSchema(BaseModelSchema):
 
 class ActivitySchema(BaseModelSchema):
     model_config = ConfigDict(from_attributes=True)
+
+
+class ActivitySchemaWithLocations(BaseModelSchema):
+    model_config = ConfigDict(from_attributes=True)
     locations: list[LocationSchema]
 
 
 class ActivityListResultSchemas(BaseResultSchema):
-    result: list[ActivitySchema] | None
+    result: list[ActivitySchemaWithLocations] | None
 
 
 class ActivityItemResultSchema(BaseResultSchema):
-    result: ActivitySchema | None
+    result: ActivitySchemaWithLocations | None
 
 
 class LocationSchemaWithActivities(BaseModelSchema):
     model_config = ConfigDict(from_attributes=True)
     country: CountrySchema
-    activities: list[BaseModelSchema]
+    activities: list[ActivitySchema]
 
 
 class LocationListResultSchemas(BaseResultSchema):
