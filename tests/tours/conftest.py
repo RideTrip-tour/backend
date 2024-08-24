@@ -9,6 +9,22 @@ from src.core.tours import models
 
 
 @pytest.fixture
+def country_data() -> dict:
+    """Возвращает данные тестовой страны"""
+    return {"name": "test_country"}
+
+
+@pytest_asyncio.fixture
+async def country(session, country_data):
+    """Создает и возвращает объект тестовой страны"""
+    country = models.Country(**country_data)
+    session.add(country)
+    await session.commit()
+    await session.refresh(country)
+    return country
+
+
+@pytest.fixture
 def activity_data() -> dict:
     """Возвращает данные тестовой активности"""
     return {"name": "test_activity"}
@@ -16,7 +32,7 @@ def activity_data() -> dict:
 
 @pytest_asyncio.fixture
 async def activity(session, activity_data) -> models.Activity:
-    """Создает и возвращает модель Активности"""
+    """Создает и возвращает объект Активности"""
     activity = models.Activity(**activity_data)
     session.add(activity)
     await session.commit()
@@ -40,12 +56,12 @@ async def activity_with_locations(
 
 @pytest.fixture
 def activity_data_with_locations(
-    activity_data, location_data, location
+    activity_data, location_data_with_country_row, location
 ) -> dict:
     """Возвращает данные активности со списком локаций"""
     return {
         **activity_data,
-        "locations": [{"id": location.id, **location_data}],
+        "locations": [{"id": location.id, **location_data_with_country_row}],
     }
 
 
@@ -61,18 +77,32 @@ async def list_activities(session) -> None:
 
 
 @pytest.fixture
-def location_data() -> dict:
+def location_data_with_country_id(country) -> dict:
     """Возвращает данные тестовой локации"""
-    return {"name": "test_location"}
+    return {"name": "test_location", "country_id": country.id}
+
+
+@pytest.fixture
+def location_data_with_country_row(country, country_data) -> dict:
+    """Возвращает данные тестовой локации"""
+    return {
+        "name": "test_location",
+        "country": {"id": country.id, **country_data},
+    }
 
 
 @pytest_asyncio.fixture
-async def location(session, location_data) -> models.Location:
+async def location(session, location_data_with_country_id) -> models.Location:
     """Возвращает тестовую локацию"""
-    location = models.Location(**location_data)
+    location = models.Location(**location_data_with_country_id)
     session.add(location)
     await session.commit()
-    await session.refresh(location)
+    await session.refresh(
+        location,
+        [
+            "country",
+        ],
+    )
     return location
 
 
@@ -92,20 +122,23 @@ async def location_with_activity(
 
 @pytest.fixture
 def location_data_with_activity(
-    activity_data, location_data, activity
+    activity_data, location_data_with_country_row, activity
 ) -> dict:
     """Возвращает данные с тестовой локации с активностью"""
     return {
-        **location_data,
+        **location_data_with_country_row,
         "activities": [{"id": activity.id, **activity_data}],
     }
 
 
 @pytest_asyncio.fixture
-async def list_locations(session) -> None:
+async def list_locations(session, country) -> None:
     """Создает список тестовых локаций"""
     locations = [
-        models.Location(name=f"location_{i}")
+        models.Location(
+            name=f"location_{i}",
+            country_id=country.id,
+        )
         for i in range(AMOUNT_ITEMS_FOR_TEST)
     ]
     session.add_all(locations)
