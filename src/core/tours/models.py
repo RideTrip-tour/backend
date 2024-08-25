@@ -176,18 +176,18 @@ class Tour(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     description = Column(Text)
     activity_id = Column(ForeignKey("activities.id"), nullable=False)
-    start_location_id = Column(ForeignKey("locations.id"), nullable=False)
     target_location_id = Column(ForeignKey("locations.id"), nullable=False)
+    start_location_id = Column(ForeignKey("locations.id"), nullable=False)
     departure_trip_id = Column(ForeignKey("trips.id"), nullable=False)
     return_trip_id = Column(ForeignKey("trips.id"), nullable=False)
     accommodation_id = Column(ForeignKey("accommodations.id"), nullable=False)
 
     activity: Mapped["Activity"] = relationship()
-    start_location: Mapped["Location"] = relationship(
-        foreign_keys=[start_location_id]
-    )
     target_location: Mapped["Location"] = relationship(
         foreign_keys=[target_location_id]
+    )
+    start_location: Mapped["Location"] = relationship(
+        foreign_keys=[start_location_id]
     )
     departure_trip: Mapped["Trip"] = relationship(
         foreign_keys=[departure_trip_id]
