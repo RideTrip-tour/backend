@@ -105,3 +105,35 @@ async def get_location(
     )
     response = await session.execute(query)
     return response.scalar()
+
+
+async def get_list_tours(
+    session: AsyncSession,
+    act: int | None = None,
+    loc: int | None = None,
+) -> ScalarResult:
+    """
+    Возвращает список туров
+    :param session:
+        Сессия
+    :param act:
+        Если указан возвращает только туры с этой активностью
+    :param loc:
+        Если указан возвращает только туры в эту локацию
+    :return:
+        Список туров
+    """
+    query = select(
+        models.Tour,
+    ).options(
+        joinedload(models.Tour.activity),
+        joinedload(models.Tour.target_location).joinedload(
+            models.Location.country
+        ),
+    )
+    if act:
+        query = query.where(models.Tour.activity_id == act)
+    if loc:
+        query = query.where(models.Tour.target_location_id == loc)
+    response = await session.execute(query)
+    return response.scalars().unique()

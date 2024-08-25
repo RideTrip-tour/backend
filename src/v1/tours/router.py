@@ -56,3 +56,18 @@ async def get_location(
         "status": "access",
         "result": location,
     }
+
+
+@router.get(
+    "tours/",
+)
+async def get_tours(
+    act: int | None = None,
+    loc: int | None = None,
+    session: AsyncSession = Depends(get_async_session),
+):
+    tours = await crud.get_list_tours(session, act=act, loc=loc)
+    return {
+        "status": "access",
+        "result": tours,
+    }
