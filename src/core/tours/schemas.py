@@ -108,3 +108,7 @@ class TourSchema(IDFieldModelSchema):
 
 class TourListResultSchema(BaseResultSchema):
     result: list[TourSchema]
+
+
+class TourItemResultSchema(BaseResultSchema):
+    result: TourSchema | None

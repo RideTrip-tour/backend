@@ -137,6 +137,18 @@ async def get_list_tours(
             joinedload(models.Trip.start_location).joinedload(
                 models.Location.country
             ),
+            joinedload(models.Trip.target_location).joinedload(
+                models.Location.country
+            ),
+            joinedload(models.Trip.segments),
+        ),
+        joinedload(models.Tour.return_trip).options(
+            joinedload(models.Trip.start_location).joinedload(
+                models.Location.country
+            ),
+            joinedload(models.Trip.target_location).joinedload(
+                models.Location.country
+            ),
             joinedload(models.Trip.segments),
         ),
         joinedload(models.Tour.accommodation).joinedload(
@@ -149,3 +161,51 @@ async def get_list_tours(
         query = query.where(models.Tour.target_location_id == loc)
     response = await session.execute(query)
     return response.scalars().unique()
+
+
+async def get_tour(session: AsyncSession, tour_id: int) -> Result | None:
+    """
+    Возвращает тур по ID
+    :param session:
+        Сессия
+    :param tour_id:
+        ID нужного тура
+    :return:
+        Тур
+    """
+    query = (
+        (select(models.Tour))
+        .options(
+            joinedload(models.Tour.activity),
+            joinedload(models.Tour.target_location).joinedload(
+                models.Location.country
+            ),
+            joinedload(models.Tour.start_location).joinedload(
+                models.Location.country
+            ),
+            joinedload(models.Tour.departure_trip).options(
+                joinedload(models.Trip.start_location).joinedload(
+                    models.Location.country
+                ),
+                joinedload(models.Trip.target_location).joinedload(
+                    models.Location.country
+                ),
+                joinedload(models.Trip.segments),
+            ),
+            joinedload(models.Tour.return_trip).options(
+                joinedload(models.Trip.start_location).joinedload(
+                    models.Location.country
+                ),
+                joinedload(models.Trip.target_location).joinedload(
+                    models.Location.country
+                ),
+                joinedload(models.Trip.segments),
+            ),
+            joinedload(models.Tour.accommodation).joinedload(
+                models.Accommodation.accommodation_type
+            ),
+        )
+        .filter_by(id=tour_id)
+    )
+    response = await session.execute(query)
+    return response.scalar()

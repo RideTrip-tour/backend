@@ -57,17 +57,6 @@ async def activity_with_locations(
     return activity
 
 
-@pytest.fixture
-def activity_data_with_locations(
-    activity_data, location_data_with_country_row, location
-) -> dict:
-    """Возвращает данные активности со списком локаций"""
-    return {
-        **activity_data,
-        "locations": [{"id": location.id, **location_data_with_country_row}],
-    }
-
-
 @pytest_asyncio.fixture
 async def list_activities(session) -> None:
     """Добавляет список активностей в БД"""
@@ -121,17 +110,6 @@ async def location_with_activity(
         ],
     )
     return location
-
-
-@pytest.fixture
-def location_data_with_activity(
-    activity_data, location_data_with_country_row, activity
-) -> dict:
-    """Возвращает данные с тестовой локации с активностью"""
-    return {
-        **location_data_with_country_row,
-        "activities": [{"id": activity.id, **activity_data}],
-    }
 
 
 @pytest_asyncio.fixture
@@ -198,8 +176,8 @@ async def activities_locations_table_add_row(
 
 @pytest_asyncio.fixture
 async def list_tours(
-    session, activities_locations, list_trip, list_accommodations
-) -> None:
+    session, activities_locations, list_trips, list_accommodations
+) -> list[models.Tour]:
     """Создает список туров"""
     tours = [
         models.Tour(
@@ -215,10 +193,11 @@ async def list_tours(
     ]
     session.add_all(tours)
     await session.commit()
+    return tours
 
 
 @pytest_asyncio.fixture
-async def list_trip(session, activities_locations) -> None:
+async def list_trips(session, activities_locations) -> None:
     """Создает список поездок"""
     trips = [
         models.Trip(
@@ -260,3 +239,9 @@ async def accommodation_type(session):
     await session.commit()
     await session.refresh(accommodation_type)
     return accommodation_type
+
+
+@pytest_asyncio.fixture
+async def tour(session, list_tours):
+    tour = await session.get(models.Tour, 1)
+    return tour

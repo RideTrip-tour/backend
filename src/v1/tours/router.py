@@ -69,3 +69,17 @@ async def get_tours(
         "status": "access",
         "result": tours,
     }
+
+
+@router.get(
+    "/tours/{tour_id}",
+    response_model=schemas.TourItemResultSchema,
+)
+async def get_tour(
+    tour_id: int, session: AsyncSession = Depends(get_async_session)
+):
+    activity = await crud.get_tour(session, tour_id)
+    return {
+        "status": "access",
+        "result": activity,
+    }

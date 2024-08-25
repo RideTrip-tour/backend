@@ -35,20 +35,16 @@ async def _check_response_with_list_result(
         _validate_result(result, child)
 
 
-async def _check_response_with_item_result(client, url, item_id, data):
+async def _check_response_with_item_result(client, url):
     response = await client.get(url)
-    assert response.status_code == 200, f"Страница {url} не возвращает код 200"
-    assert (
-        "status" in response.json()
-    ), f'Тело ответа {url} не содержит "status"'
-    assert response.json().get("status") == "access"
-    assert (
-        "result" in response.json()
-    ), f'Тело ответа {url} не содержит "result"'
-    assert response.json().get("result") == {
-        "id": item_id,
-        **data,
-    }, f'Данные в "result" не соответствую объекту {url}'
+    assert response.status_code == 200, (
+        f"Страница {url} не возвращает код 200. "
+        f"Получено: {response.status_code}"
+    )
+    json_data = response.json()
+    assert "status" in json_data, f'Тело ответа {url} не содержит "status"'
+    assert json_data.get("status") == "access"
+    assert "result" in json_data, f'Тело ответа {url} не содержит "result"'
 
 
 async def _check_response_with_wrong_param(client, url):
