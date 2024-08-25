@@ -57,12 +57,12 @@ class Location(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
+    country_id = Column(ForeignKey("countries.id"), nullable=False)
 
+    country: Mapped["Country"] = relationship()
     activities: Mapped[list["Activity"]] = relationship(
         secondary=activities_locations_table, back_populates="locations"
     )
-    country_id = Column(ForeignKey("countries.id"), nullable=False)
-    country: Mapped["Country"] = relationship()
 
 
 class TransportType(Base):
@@ -79,7 +79,6 @@ class TripSegment(Base):
     transport_type_id = Column(
         ForeignKey("transport_types.id"), nullable=False
     )
-    transport_type: Mapped["TransportType"] = relationship()
     created_at = Column(
         DateTime,
         default=lambda: datetime.now(timezone.utc),
@@ -94,10 +93,12 @@ class TripSegment(Base):
     )
     prise = Column(Numeric(10, 2), nullable=False)
     start_location_id = Column(ForeignKey("locations.id"), nullable=False)
+    target_location_id = Column(ForeignKey("locations.id"), nullable=False)
+
+    transport_type: Mapped["TransportType"] = relationship()
     start_location: Mapped["Location"] = relationship(
         foreign_keys=[start_location_id]
     )
-    target_location_id = Column(ForeignKey("locations.id"), nullable=False)
     target_location: Mapped["Location"] = relationship(
         foreign_keys=[target_location_id]
     )
@@ -110,9 +111,6 @@ class Trip(Base):
     __tablename__ = "trips"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    segments: Mapped[list["TripSegment"]] = relationship(
-        secondary=trips_segments_table, back_populates="trips"
-    )
     created_at = Column(
         DateTime,
         default=lambda: datetime.now(timezone.utc),
@@ -126,12 +124,16 @@ class Trip(Base):
         nullable=False,
     )
     start_location_id = Column(ForeignKey("locations.id"), nullable=False)
+    target_location_id = Column(ForeignKey("locations.id"), nullable=False)
+
     start_location: Mapped["Location"] = relationship(
         foreign_keys=[start_location_id]
     )
-    target_location_id = Column(ForeignKey("locations.id"), nullable=False)
     target_location: Mapped["Location"] = relationship(
         foreign_keys=[target_location_id]
+    )
+    segments: Mapped[list["TripSegment"]] = relationship(
+        secondary=trips_segments_table, back_populates="trips"
     )
 
 
@@ -149,7 +151,6 @@ class Accommodation(Base):
     accommodation_type_id = Column(
         ForeignKey("accommodation_types.id"), nullable=False
     )
-    accommodation_type: Mapped["AccommodationType"] = relationship()
     created_at = Column(
         DateTime,
         default=lambda: datetime.now(timezone.utc),
@@ -163,8 +164,10 @@ class Accommodation(Base):
         nullable=False,
     )
     location_id = Column(ForeignKey("locations.id"), nullable=False)
-    location: Mapped["Location"] = relationship(foreign_keys=[location_id])
     prise = Column(Numeric(10, 2), nullable=False)
+
+    accommodation_type: Mapped["AccommodationType"] = relationship()
+    location: Mapped["Location"] = relationship(foreign_keys=[location_id])
 
 
 class Tour(Base):
@@ -173,23 +176,21 @@ class Tour(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     description = Column(Text)
     activity_id = Column(ForeignKey("activities.id"), nullable=False)
-    activity: Mapped["Activity"] = relationship()
-
     start_location_id = Column(ForeignKey("locations.id"), nullable=False)
+    target_location_id = Column(ForeignKey("locations.id"), nullable=False)
+    departure_trip_id = Column(ForeignKey("trips.id"), nullable=False)
+    return_trip_id = Column(ForeignKey("trips.id"), nullable=False)
+    accommodation_id = Column(ForeignKey("accommodations.id"), nullable=False)
+
+    activity: Mapped["Activity"] = relationship()
     start_location: Mapped["Location"] = relationship(
         foreign_keys=[start_location_id]
     )
-    target_location_id = Column(ForeignKey("locations.id"), nullable=False)
     target_location: Mapped["Location"] = relationship(
         foreign_keys=[target_location_id]
     )
-
-    departure_trip_id = Column(ForeignKey("trips.id"), nullable=False)
     departure_trip: Mapped["Trip"] = relationship(
         foreign_keys=[departure_trip_id]
     )
-    return_trip_id = Column(ForeignKey("trips.id"), nullable=False)
     return_trip: Mapped["Trip"] = relationship(foreign_keys=[return_trip_id])
-
-    accommodation_id = Column(ForeignKey("accommodations.id"), nullable=False)
     accommodation: Mapped["Accommodation"] = relationship()
