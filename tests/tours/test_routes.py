@@ -16,7 +16,7 @@ class TestActivities:
 
     async def test_list_activities(self, client, list_activities):
         url = self.base_url
-        await _check_response_with_list_result(client, url, "locations")
+        await _check_response_with_list_result(client, url, ["locations"])
 
     async def test_retrieve_activity(
         self, client, activity_with_locations, activity_data_with_locations
@@ -65,7 +65,7 @@ class TestLocation:
 
     async def test_list_locations(self, client, list_locations):
         url = self.base_url
-        await _check_response_with_list_result(client, url, "activities")
+        await _check_response_with_list_result(client, url, ["activities"])
 
     async def test_retrieve_location(
         self, client, location_with_activity, location_data_with_activity

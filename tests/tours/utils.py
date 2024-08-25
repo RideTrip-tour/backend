@@ -12,7 +12,9 @@ def _validate_result(result: list[dict], related: str):
     return True
 
 
-async def _check_response_with_list_result(client, url: str, related: str):
+async def _check_response_with_list_result(
+    client, url: str, children: list[str]
+):
     response = await client.get(url)
     assert response.status_code == 200, f"Страница {url} не возвращает код 200"
     assert (
@@ -26,8 +28,8 @@ async def _check_response_with_list_result(client, url: str, related: str):
     assert (
         len(result) == AMOUNT_ITEMS_FOR_TEST
     ), f'Тело ответа {url} содержит не верное количество записей в "result" '
-
-    assert _validate_result(result, related)
+    for child in children:
+        assert _validate_result(result, child)
 
 
 async def _check_response_with_item_result(client, url, item_id, data):
