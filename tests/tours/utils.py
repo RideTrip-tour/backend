@@ -53,7 +53,9 @@ async def _check_response_with_item_result(client, url, item_id, data):
 
 async def _check_response_with_wrong_param(client, url):
     response = await client.get(url)
-    assert response.json().get("status") == "access"
-    assert (
-        response.json().get("result") == []
-    ), 'В "result" должен быть пустой список'
+    json_data = response.json()
+    assert json_data.get("status") == "access"
+    assert json_data.get("result") == [], (
+        f'В "result" должен быть пустой список для {url}.'
+        f"Получено: {json_data}"
+    )
