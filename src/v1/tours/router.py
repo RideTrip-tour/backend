@@ -69,5 +69,5 @@ async def get_tours(
     tours = await crud.get_list_tours(session, act=act, loc=loc)
     return {
         "status": "access",
-        "result": tours,
+        "result": tours.all(),
     }

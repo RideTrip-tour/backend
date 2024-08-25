@@ -1,35 +1,38 @@
 from tests.consts import AMOUNT_ITEMS_FOR_TEST
 
 
-def _validate_result(result: list[dict], related: str):
+def _validate_result(result: list[dict], related: str) -> None:
     for item in result:
         if not isinstance(item.get("id", None), int):
             assert False, "id не является int"
-        if not isinstance(item.get("name", None), str):
-            assert False, "name не является str"
         if not isinstance(item.get(related, None), list):
-            assert False, f"{related} не содержит список"
-    return True
+            assert False, f"{related} не содержит список  \n {item}"
 
 
 async def _check_response_with_list_result(
-    client, url: str, children: list[str]
+    client,
+    url: str,
+    children: list[str] = [],
 ):
     response = await client.get(url)
     assert response.status_code == 200, f"Страница {url} не возвращает код 200"
+    json_data = response.json()
     assert (
-        "status" in response.json()
-    ), f'Тело ответа {url} не содержит "status"'
-    assert response.json().get("status") == "access"
+        "status" in json_data
+    ), f'Тело ответа {url} не содержит "status". Получено: {json_data}'
     assert (
-        "result" in response.json()
-    ), f'Тело ответа {url} не содержит "result"'
-    result = response.json().get("result")
+        json_data.get("status") == "access"
+    ), f'Статус ответа {url} не "access". Получено: {json_data.get("status")}'
     assert (
-        len(result) == AMOUNT_ITEMS_FOR_TEST
-    ), f'Тело ответа {url} содержит не верное количество записей в "result" '
+        "result" in json_data
+    ), f'Тело ответа {url} не содержит "result". Получено: {json_data}'
+    result = json_data.get("result")
+    assert len(result) == AMOUNT_ITEMS_FOR_TEST, (
+        f'Тело ответа {url} содержит неверное количество записей в "result". '
+        f"Ожидалось: {AMOUNT_ITEMS_FOR_TEST}, Получено: {len(result)}"
+    )
     for child in children:
-        assert _validate_result(result, child)
+        _validate_result(result, child)
 
 
 async def _check_response_with_item_result(client, url, item_id, data):

@@ -102,3 +102,11 @@ class TestLocation:
     async def test_list_location_with_wrong_param(self, client, session):
         url = f"{self.base_url}?act=9999"
         await _check_response_with_wrong_param(client, url)
+
+
+class TestTours:
+    base_url = "/v1/tours"
+
+    async def test_list_tours(self, client, list_tours):
+        url = self.base_url
+        await _check_response_with_list_result(client, url)

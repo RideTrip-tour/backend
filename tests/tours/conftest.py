@@ -2,10 +2,13 @@ from random import randint
 
 import pytest
 import pytest_asyncio
+from faker import Faker
 from sqlalchemy import insert
 from tests.consts import AMOUNT_ITEMS_FOR_TEST
 
 from src.core.tours import models
+
+fk = Faker("ru_RU")
 
 
 @pytest.fixture
@@ -148,9 +151,10 @@ async def list_locations(session, country) -> None:
 @pytest_asyncio.fixture
 async def activities_locations(
     session, list_locations, list_activities, location, activity
-) -> None:
+) -> list[dict]:
     """Создает связи локаций и активностей.
-    Минимум AMOUNT_ITEMS_FOR_TEST // 2 - 1 связей"""
+    Минимум AMOUNT_ITEMS_FOR_TEST // 2 - 1 связей
+    Минимум записей AMOUNT_ITEMS_FOR_TEST"""
     r: int = AMOUNT_ITEMS_FOR_TEST
     datas: set[tuple[int, int]] = set()
     for i in range(1, (r // 2)):
@@ -176,6 +180,7 @@ async def activities_locations(
     stmt = insert(models.activities_locations_table).values(values)
     await session.execute(stmt)
     await session.commit()
+    return values
 
 
 @pytest_asyncio.fixture
@@ -189,3 +194,69 @@ async def activities_locations_table_add_row(
     )
     await session.execute(stmt)
     await session.commit()
+
+
+@pytest_asyncio.fixture
+async def list_tours(
+    session, activities_locations, list_trip, list_accommodations
+) -> None:
+    """Создает список туров"""
+    tours = [
+        models.Tour(
+            description=f"big instruction with details tour{i}",
+            activity_id=activities_locations[i].get("activity_id"),
+            target_location_id=activities_locations[i].get("location_id"),
+            start_location_id=i + 1,
+            departure_trip_id=i + 1,
+            return_trip_id=AMOUNT_ITEMS_FOR_TEST - i,
+            accommodation_id=i + 1,
+        )
+        for i in range(AMOUNT_ITEMS_FOR_TEST)
+    ]
+    session.add_all(tours)
+    await session.commit()
+
+
+@pytest_asyncio.fixture
+async def list_trip(session, activities_locations) -> None:
+    """Создает список поездок"""
+    trips = [
+        models.Trip(
+            start_at=fk.date_time_this_month(before_now=True),
+            finish_at=fk.date_time_this_month(after_now=True),
+            target_location_id=activities_locations[i].get("location_id"),
+            start_location_id=i + 1,
+        )
+        for i in range(AMOUNT_ITEMS_FOR_TEST)
+    ]
+    session.add_all(trips)
+    await session.commit()
+
+
+@pytest_asyncio.fixture
+async def list_accommodations(
+    session, list_locations, accommodation_type
+) -> None:
+    """Создает список вариантов проживания"""
+    accommodations = [
+        models.Accommodation(
+            accommodation_type_id=accommodation_type.id,
+            checkin_at=fk.date_time_this_month(before_now=True),
+            checkout_at=fk.date_time_this_month(after_now=True),
+            location_id=i + 1,
+            price=fk.random_int(100, 10000),
+        )
+        for i in range(AMOUNT_ITEMS_FOR_TEST)
+    ]
+    session.add_all(accommodations)
+    await session.commit()
+
+
+@pytest_asyncio.fixture
+async def accommodation_type(session):
+    """Создает тип варианта проживания"""
+    accommodation_type = models.AccommodationType(name=fk.name_nonbinary())
+    session.add(accommodation_type)
+    await session.commit()
+    await session.refresh(accommodation_type)
+    return accommodation_type
