@@ -8,6 +8,7 @@ from sqlalchemy import (
     Numeric,
     String,
     Table,
+    Text,
 )
 from sqlalchemy.orm import Mapped, relationship
 
@@ -170,7 +171,7 @@ class Tour(Base):
     __tablename__ = "tours"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-
+    description = Column(Text)
     activity_id = Column(ForeignKey("activities.id"), nullable=False)
     activity: Mapped["Activity"] = relationship()
 
@@ -189,5 +190,6 @@ class Tour(Base):
     )
     return_trip_id = Column(ForeignKey("trips.id"), nullable=False)
     return_trip: Mapped["Trip"] = relationship(foreign_keys=[return_trip_id])
+
     accommodation_id = Column(ForeignKey("accommodations.id"), nullable=False)
     accommodation: Mapped["Accommodation"] = relationship()
