@@ -130,6 +130,18 @@ async def get_list_tours(
         joinedload(models.Tour.target_location).joinedload(
             models.Location.country
         ),
+        joinedload(models.Tour.start_location).joinedload(
+            models.Location.country
+        ),
+        joinedload(models.Tour.departure_trip).options(
+            joinedload(models.Trip.start_location).joinedload(
+                models.Location.country
+            ),
+            joinedload(models.Trip.segments),
+        ),
+        joinedload(models.Tour.accommodation).joinedload(
+            models.Accommodation.accommodation_type
+        ),
     )
     if act:
         query = query.where(models.Tour.activity_id == act)

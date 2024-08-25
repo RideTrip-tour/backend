@@ -9,7 +9,7 @@ from . import crud
 router = APIRouter()
 
 
-@router.get("/activities", response_model=schemas.ActivityListResultSchemas)
+@router.get("/activities", response_model=schemas.ActivityListResultSchema)
 async def get_activities(
     loc: int | None = None, session: AsyncSession = Depends(get_async_session)
 ):
@@ -34,7 +34,7 @@ async def get_activity(
     }
 
 
-@router.get("/locations", response_model=schemas.LocationListResultSchemas)
+@router.get("/locations", response_model=schemas.LocationListResultSchema)
 async def get_locations(
     act: int | None = None, session: AsyncSession = Depends(get_async_session)
 ):
@@ -58,9 +58,7 @@ async def get_location(
     }
 
 
-@router.get(
-    "/tours",
-)
+@router.get("/tours", response_model=schemas.TourListResultSchema)
 async def get_tours(
     act: int | None = None,
     loc: int | None = None,
@@ -69,5 +67,5 @@ async def get_tours(
     tours = await crud.get_list_tours(session, act=act, loc=loc)
     return {
         "status": "access",
-        "result": tours.all(),
+        "result": tours,
     }
