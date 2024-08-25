@@ -80,18 +80,19 @@ class TripSegment(Base):
         ForeignKey("transport_types.id"), nullable=False
     )
     created_at = Column(
-        DateTime,
+        DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
+        nullable=False,
     )
     start_at = Column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
     )
     finish_at = Column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
     )
-    prise = Column(Numeric(10, 2), nullable=False)
+    price = Column(Numeric(10, 2), nullable=False)
     start_location_id = Column(ForeignKey("locations.id"), nullable=False)
     target_location_id = Column(ForeignKey("locations.id"), nullable=False)
 
@@ -112,15 +113,16 @@ class Trip(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     created_at = Column(
-        DateTime,
+        DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
+        nullable=False,
     )
     start_at = Column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
     )
     finish_at = Column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
     )
     start_location_id = Column(ForeignKey("locations.id"), nullable=False)
@@ -164,7 +166,7 @@ class Accommodation(Base):
         nullable=False,
     )
     location_id = Column(ForeignKey("locations.id"), nullable=False)
-    prise = Column(Numeric(10, 2), nullable=False)
+    price = Column(Numeric(10, 2), nullable=False)
 
     accommodation_type: Mapped["AccommodationType"] = relationship()
     location: Mapped["Location"] = relationship(foreign_keys=[location_id])
