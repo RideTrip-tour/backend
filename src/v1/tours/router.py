@@ -59,7 +59,7 @@ async def get_location(
 
 
 @router.get(
-    "tours/",
+    "/tours",
 )
 async def get_tours(
     act: int | None = None,
