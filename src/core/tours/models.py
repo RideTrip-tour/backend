@@ -154,15 +154,16 @@ class Accommodation(Base):
         ForeignKey("accommodation_types.id"), nullable=False
     )
     created_at = Column(
-        DateTime,
+        DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
+        nullable=False,
     )
     checkin_at = Column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
     )
     checkout_at = Column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
     )
     location_id = Column(ForeignKey("locations.id"), nullable=False)
