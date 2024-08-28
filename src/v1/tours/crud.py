@@ -105,3 +105,107 @@ async def get_location(
     )
     response = await session.execute(query)
     return response.scalar()
+
+
+async def get_list_tours(
+    session: AsyncSession,
+    act: int | None = None,
+    loc: int | None = None,
+) -> ScalarResult:
+    """
+    Возвращает список туров
+    :param session:
+        Сессия
+    :param act:
+        Если указан возвращает только туры с этой активностью
+    :param loc:
+        Если указан возвращает только туры в эту локацию
+    :return:
+        Список туров
+    """
+    query = select(
+        models.Tour,
+    ).options(
+        joinedload(models.Tour.activity),
+        joinedload(models.Tour.target_location).joinedload(
+            models.Location.country
+        ),
+        joinedload(models.Tour.start_location).joinedload(
+            models.Location.country
+        ),
+        joinedload(models.Tour.departure_trip).options(
+            joinedload(models.Trip.start_location).joinedload(
+                models.Location.country
+            ),
+            joinedload(models.Trip.target_location).joinedload(
+                models.Location.country
+            ),
+            joinedload(models.Trip.segments),
+        ),
+        joinedload(models.Tour.return_trip).options(
+            joinedload(models.Trip.start_location).joinedload(
+                models.Location.country
+            ),
+            joinedload(models.Trip.target_location).joinedload(
+                models.Location.country
+            ),
+            joinedload(models.Trip.segments),
+        ),
+        joinedload(models.Tour.accommodation).joinedload(
+            models.Accommodation.accommodation_type
+        ),
+    )
+    if act:
+        query = query.where(models.Tour.activity_id == act)
+    if loc:
+        query = query.where(models.Tour.target_location_id == loc)
+    response = await session.execute(query)
+    return response.scalars().unique()
+
+
+async def get_tour(session: AsyncSession, tour_id: int) -> Result | None:
+    """
+    Возвращает тур по ID
+    :param session:
+        Сессия
+    :param tour_id:
+        ID нужного тура
+    :return:
+        Тур
+    """
+    query = (
+        (select(models.Tour))
+        .options(
+            joinedload(models.Tour.activity),
+            joinedload(models.Tour.target_location).joinedload(
+                models.Location.country
+            ),
+            joinedload(models.Tour.start_location).joinedload(
+                models.Location.country
+            ),
+            joinedload(models.Tour.departure_trip).options(
+                joinedload(models.Trip.start_location).joinedload(
+                    models.Location.country
+                ),
+                joinedload(models.Trip.target_location).joinedload(
+                    models.Location.country
+                ),
+                joinedload(models.Trip.segments),
+            ),
+            joinedload(models.Tour.return_trip).options(
+                joinedload(models.Trip.start_location).joinedload(
+                    models.Location.country
+                ),
+                joinedload(models.Trip.target_location).joinedload(
+                    models.Location.country
+                ),
+                joinedload(models.Trip.segments),
+            ),
+            joinedload(models.Tour.accommodation).joinedload(
+                models.Accommodation.accommodation_type
+            ),
+        )
+        .filter_by(id=tour_id)
+    )
+    response = await session.execute(query)
+    return response.scalar()
